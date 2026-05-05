@@ -67,7 +67,8 @@ function setupEventListeners() {
   document.getElementById('filterReports').addEventListener('click', loadReports);
 
   // Customer search
-  document.getElementById('customerSearch').addEventListener('input', debounce(() => loadCustomers(), 300));
+  document.getElementById('customerSearch').addEventListener('input', debounce((e) => loadCustomers(e.target.value), 300));
+
 
 
   // Print
@@ -393,13 +394,14 @@ function renderReports(bills) {
   `).join('') || '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-500">No sales</td></tr>';
 }
 
-let searchTimeout;
 async function loadCustomers(search = '') {
+  const params = search ? `?search=${encodeURIComponent(search)}` : '';
   try {
-    const customers = await api(`/customers${search ? `?search=${encodeURIComponent(search)}` : ''}`);
+    const customers = await api(`/customers${params}`);
     renderCustomers(customers);
   } catch (err) {
-    console.error(err);
+    console.error('Customers error:', err);
+    document.getElementById('customersTable').innerHTML = '<tr><td colspan="5">Error loading customers</td></tr>';
   }
 }
 
