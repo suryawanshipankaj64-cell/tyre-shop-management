@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1777987006559,
+    "type": "Tyre",
+    "size": "14580r12",
+    "brand": "mrf",
+    "price": "2000",
+    "quantity": "1"
+  },
+  {
+    "id": 1777987045838,
+    "type": "Tyre",
+    "size": "15565r13",
+    "brand": "ceat",
+    "price": "10000",
+    "quantity": "6"
+  }
+]

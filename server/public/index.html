@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tyre Shop Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@heroicons/react@2.0.18/24/outline/index.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <!-- Login Overlay -->
+  <div id="loginOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login</h2>
+      <form id="loginForm">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <input type="text" id="loginUsername" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <input type="password" id="loginPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">Login</button>
+      </form>
+      <p id="loginError" class="text-red-500 mt-4 hidden"></p>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div class="flex h-screen bg-white shadow-lg" id="mainApp" style="display: none;">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gradient-to-b from-indigo-600 to-blue-800 text-white flex flex-col shadow-lg">
+      <div class="p-6 border-b border-indigo-700">
+        <h1 class="text-2xl font-bold">Tyre Shop</h1>
+        <p class="text-indigo-200">Management System</p>
+      </div>
+      <nav class="flex-1 p-4 space-y-2">
+        <a href="#dashboard" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-tachometer-alt mr-3"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#billing" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-receipt mr-3"></i>
+          <span>Billing</span>
+        </a>
+        <a href="#inventory" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-boxes mr-3"></i>
+          <span>Inventory</span>
+        </a>
+        <a href="#expenses" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-money-bill-wave mr-3"></i>
+          <span>Expenses</span>
+        </a>
+        <a href="#reports" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-chart-bar mr-3"></i>
+          <span>Sales Report</span>
+        </a>
+        <a href="#customers" class="nav-link flex items-center p-3 rounded-xl hover:bg-indigo-500 transition duration-200 group">
+          <i class="fas fa-users mr-3"></i>
+          <span>Customer Search</span>
+        </a>
+      </nav>
+      <div class="p-4 mt-auto">
+        <button id="logoutBtn" class="w-full flex items-center justify-center p-3 bg-red-600 hover:bg-red-700 rounded-xl text-white font-semibold transition duration-200">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <header class="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+        <div class="flex justify-between items-center">
+          <h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h2>
+          <div class="text-sm text-gray-500">Welcome, Admin</div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="flex-1 overflow-y-auto p-6">
+        <!-- Dashboard -->
+        <div id="dashboard" class="page-section">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-gradient-to-r from-green-400 to-green-600 text-white p-6 rounded-2xl shadow-xl">
+              <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-xl">
+                  <i class="fas fa-rupee-sign text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm opacity-90">Total Sales</p>
+                  <p id="totalSales" class="text-3xl font-bold">₹0</p>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 rounded-2xl shadow-xl">
+              <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-xl">
+                  <i class="fas fa-calendar-day text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm opacity-90">Today's Revenue</p>
+                  <p id="todayRevenue" class="text-3xl font-bold">₹0</p>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card bg-gradient-to-r from-red-400 to-red-600 text-white p-6 rounded-2xl shadow-xl">
+              <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-xl">
+                  <i class="fas fa-coins text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm opacity-90">Total Expenses</p>
+                  <p id="totalExpenses" class="text-3xl font-bold">₹0</p>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 rounded-2xl shadow-xl">
+              <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-xl">
+                  <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm opacity-90">Low Stock Items</p>
+                  <p id="lowStock" class="text-3xl font-bold">0</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <h3 class="text-xl font-bold text-gray-800">Recent Sales</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Customer</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Service</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Amount</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date</th>
+                  </tr>
+                </thead>
+                <tbody id="recentSales">
+                  <tr>
+                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">No recent sales</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing -->
+        <div id="billing" class="page-section hidden">
+          <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-8">Generate Bill</h3>
+            <form id="billForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Customer Name *</label>
+                <input type="text" id="customerName" required class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Mobile Number *</label>
+                <input type="tel" id="customerPhone" required class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Vehicle Number *</label>
+                <input type="text" id="vehicleNumber" required class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Service *</label>
+                <select id="service" required class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select Service</option>
+                  <option value="Puncture Repair">Puncture Repair</option>
+                  <option value="Tyre Fitting">Tyre Fitting</option>
+                  <option value="Wheel Balancing">Wheel Balancing</option>
+                  <option value="Air Check">Air Check</option>
+                  <option value="New Tyre Sale">New Tyre Sale</option>
+                  <option value="Tube Replacement">Tube Replacement</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Amount (₹) *</label>
+                <input type="number" id="billAmount" min="0" step="0.01" required class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              </div>
+              <div class="md:col-span-2">
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 shadow-xl hover:shadow-2xl transition-all duration-300">
+                  <i class="fas fa-whatsapp mr-3"></i>
+                  Generate & Share on WhatsApp
+                </button>
+              </div>
+            </form>
+            <div id="billPreview" class="mt-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl hidden border-2 border-dashed border-gray-300">
+              <h4 class="text-lg font-bold mb-4">Bill Preview</h4>
+              <pre id="billText" class="whitespace-pre-wrap text-sm font-mono"></pre>
+              <div class="mt-4 flex gap-4">
+                <button id="printBill" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold transition">
+                  <i class="fas fa-print mr-2"></i>Print
+                </button>
+                <button id="whatsappBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-semibold transition">
+                  <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory -->
+        <div id="inventory" class="page-section hidden">
+          <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-gray-800">Inventory Management</h3>
+            <button id="addInventoryBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition">
+              <i class="fas fa-plus mr-2"></i>Add Item
+            </button>
+          </div>
+          <div id="inventoryModal" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center hidden">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <h4 class="text-xl font-bold mb-6">Inventory Item</h4>
+              <form id="inventoryForm">
+                <input type="hidden" id="editInventoryId">
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold mb-2">Type</label>
+                  <select id="itemType" class="w-full p-3 border rounded-lg">
+                    <option value="Tyre">Tyre</option>
+                    <option value="Tube">Tube</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold mb-2">Size</label>
+                  <input type="text" id="itemSize" class="w-full p-3 border rounded-lg" placeholder="e.g. 145/80 R13">
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold mb-2">Brand</label>
+                  <input type="text" id="itemBrand" class="w-full p-3 border rounded-lg" placeholder="MRF, CEAT">
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold mb-2">Price (₹)</label>
+                  <input type="number" id="itemPrice" class="w-full p-3 border rounded-lg">
+                </div>
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold mb-2">Quantity</label>
+                  <input type="number" id="itemQuantity" class="w-full p-3 border rounded-lg" min="0">
+                </div>
+                <div class="flex gap-3">
+                  <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Save</button>
+                  <button type="button" id="cancelInventory" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white py-3 rounded-lg font-semibold">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Size</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Brand</th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">Price</th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">Quantity</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                  <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">No inventory items</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expenses -->
+        <div id="expenses" class="page-section hidden">
+          <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-gray-800">Expenses</h3>
+            <div class="text-2xl font-bold text-red-600">Total: ₹<span id="expensesTotal">0</span></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="expense-form bg-white p-6 rounded-2xl shadow-xl">
+              <h4 class="font-bold mb-4">Add Expense</h4>
+              <form id="expenseForm" class="space-y-4">
+                <select id="expenseType" class="w-full p-3 border rounded-lg">
+                  <option>Rent</option>
+                  <option>Electricity Bill</option>
+                  <option>Salary</option>
+                  <option>Maintenance</option>
+                  <option>Other</option>
+                </select>
+                <input type="number" id="expenseAmount" placeholder="Amount" class="w-full p-3 border rounded-lg" required>
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold">Add Expense</button>
+              </form>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left">Type</th>
+                    <th class="px-6 py-4 text-right">Amount</th>
+                    <th class="px-6 py-4 text-left">Date</th>
+                    <th class="w-20"></th>
+                  </tr>
+                </thead>
+                <tbody id="expensesTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports -->
+        <div id="reports" class="page-section hidden">
+          <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
+              <h3 class="text-2xl font-bold text-gray-800 flex-1">Sales Report</h3>
+              <div class="flex gap-4">
+                <input type="date" id="reportDateFrom" class="p-3 border rounded-xl">
+                <input type="date" id="reportDateTo" class="p-3 border rounded-xl">
+                <button id="filterReports" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">Filter</button>
+              </div>
+            </div>
+            <div class="text-right mb-6">
+              <div class="text-3xl font-bold text-green-600">Total Revenue: ₹<span id="reportTotal">0</span></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left">Customer</th>
+                    <th class="px-6 py-4 text-left">Vehicle</th>
+                    <th class="px-6 py-4 text-left">Service</th>
+                    <th class="px-6 py-4 text-right">Amount</th>
+                    <th class="px-6 py-4 text-left">Date</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customers -->
+        <div id="customers" class="page-section hidden">
+          <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <div class="flex justify-between items-center">
+              <h3 class="text-2xl font-bold text-gray-800">Customer Search</h3>
+              <input type="text" id="customerSearch" placeholder="Search by name, vehicle or phone..." class="flex-1 max-w-md p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 ml-4">
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left">Name</th>
+                    <th class="px-6 py-4 text-left">Vehicle</th>
+                    <th class="px-6 py-4 text-left">Phone</th>
+                    <th class="px-6 py-4 text-right">Total Spent</th>
+                    <th class="px-6 py-4 text-left">Services</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
